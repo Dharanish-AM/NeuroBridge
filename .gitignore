@@ -1,0 +1,4 @@
+.venv/
+scaler.pkl
+brainwave_model.pkl
+__pycache__/
