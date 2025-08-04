@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
 import numpy as np
@@ -7,11 +8,20 @@ from typing import Dict
 # Define FastAPI app
 app = FastAPI()
 
-# Load model and scaler
-model = joblib.load('brainwave_model.pkl')
-scaler = joblib.load('scaler.pkl')
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-brainwave_names = ['Delta', 'Theta', 'Alpha', 'Beta', 'Gamma']
+# Load model and scaler
+model = joblib.load("brainwave_model.pkl")
+scaler = joblib.load("scaler.pkl")
+
+brainwave_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+
 
 # Define input schema using Pydantic
 class EEGInput(BaseModel):
@@ -19,6 +29,7 @@ class EEGInput(BaseModel):
     Fp2: float
     C3: float
     C4: float
+
 
 @app.post("/predict", response_model=Dict[str, float])
 async def predict_brainwaves(eeg: EEGInput):
