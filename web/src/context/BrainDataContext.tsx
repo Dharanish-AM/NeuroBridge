@@ -42,18 +42,30 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateBrainData = async () => {
     try {
-      const inputData = {
-        Fp1: Math.random() * 1 - 0.5,
-        Fp2: Math.random() * 1 - 0.5,
-        C3: Math.random() * 1 - 0.5,
-        C4: Math.random() * 1 - 0.5
+      const testInputs = {
+        Focused: { Fp1: 45, Fp2: 50, C3: 40, C4: 42 },
+        Relaxed: { Fp1: 20, Fp2: 25, C3: 15, C4: 20 },
+        Drowsy: { Fp1: -40, Fp2: -35, C3: -25, C4: -30 },
+        Neutral: { Fp1: 5, Fp2: 5, C3: 5, C4: 5 },
       };
+      const states = Object.keys(testInputs);
+      const selectedState = states[
+        Math.floor(Math.random() * states.length)
+      ] as keyof typeof testInputs;
+      const inputData = testInputs[selectedState];
+      console.log("🧪 Selected test state:", selectedState, inputData);
+
       const response = await fetch("http://localhost:8000/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(inputData),
       });
       const result = await response.json();
+      console.log("Result :", result);
+      const totalPower = Object.values(result as Record<string, number>).reduce(
+        (acc, val) => acc + val,
+        0
+      );
 
       const brainwaveColors: Record<string, string> = {
         Delta: "#6366f1",
@@ -63,24 +75,40 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
         Gamma: "#f97316",
       };
 
-      const brainwaves: BrainwaveData[] = Object.entries(result).map(([name, value]) => {
-        const properName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-        return {
-          name: properName,
-          value,
-          color: brainwaveColors[properName] || "#000",
-        };
-      });
+      const brainwaves: BrainwaveData[] = Object.entries(result).map(
+        ([name, value]) => {
+          const properName =
+            name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+          const numericValue =
+            typeof value === "number" ? value : parseFloat(String(value));
+          const percent = (numericValue / totalPower) * 100;
+          return {
+            name: properName,
+            value: Math.round((percent + Number.EPSILON) * 100) / 100,
+            color: brainwaveColors[properName] || "#000",
+          };
+        }
+      );
 
-      const deltaValue = result.Delta || 0;
-      const thetaValue = result.Theta || 0;
-      const alphaValue = result.Alpha || 0;
+      const dominantWave = brainwaves.reduce((a, b) =>
+        a.value > b.value ? a : b
+      );
+      console.log(
+        `🧠 Dominant: ${dominantWave.name} (${dominantWave.value.toFixed(2)}%)`
+      );
+
+      const mentalState: MentalState =
+        dominantWave.name === "Beta"
+          ? "Focused"
+          : dominantWave.name === "Alpha"
+          ? "Relaxed"
+          : dominantWave.name === "Delta" || dominantWave.name === "Theta"
+          ? "Drowsy"
+          : "Neutral";
+
       const betaValue = result.Beta || 0;
-
-      let mentalState: MentalState = "Neutral";
-      if (betaValue > 30000) mentalState = "Focused";
-      else if (alphaValue > 30000) mentalState = "Relaxed";
-      else if (deltaValue + thetaValue > 90000) mentalState = "Drowsy";
+      const alphaValue = result.Alpha || 0;
+      const thetaValue = result.Theta || 0;
 
       const focusLevel = Math.min(
         100,
