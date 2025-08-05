@@ -9,7 +9,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
 # Load dataset
-df = pd.read_csv('eeg_brainwave_dataset.csv')
+df = pd.read_csv('eeg_brainwave_data.csv')
 
 # Input (EEG signals) and Output (Brainwave frequencies)
 X = df[['Fp1', 'Fp2', 'C3', 'C4']]

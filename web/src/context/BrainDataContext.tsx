@@ -9,7 +9,7 @@ export interface ChannelData {
 
 export interface BrainwaveData {
   name: string;
-  value: number; // Percentage
+  value: number;
   color: string;
 }
 
@@ -42,18 +42,12 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateBrainData = async () => {
     try {
-      const testInputs = {
-        Focused: { Fp1: 45, Fp2: 50, C3: 40, C4: 42 },
-        Relaxed: { Fp1: 20, Fp2: 25, C3: 15, C4: 20 },
-        Drowsy: { Fp1: -40, Fp2: -35, C3: -25, C4: -30 },
-        Neutral: { Fp1: 5, Fp2: 5, C3: 5, C4: 5 },
-      };
-      const states = Object.keys(testInputs);
-      const selectedState = states[
-        Math.floor(Math.random() * states.length)
-      ] as keyof typeof testInputs;
-      const inputData = testInputs[selectedState];
-      console.log("🧪 Selected test state:", selectedState, inputData);
+      const inputData = {
+        Fp1: Math.random() * 100,
+        Fp2: Math.random() * 100,
+        C3: Math.random() * 100,
+        C4: Math.random() * 100,
+      }
 
       const response = await fetch("http://localhost:8000/predict", {
         method: "POST",
