@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect, useRef } from "react";
 
 // Define types for our brain data
 export interface ChannelData {
@@ -36,13 +36,15 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [brainwaves, setBrainwaves] = useState<BrainwaveData[]>([]);
   const [mentalState, setMentalState] = useState<MentalState>("Neutral");
   const [focusLevel, setFocusLevel] = useState<number>(0);
+  const isMessage = false;
   const [timeSeriesData, setTimeSeriesData] = useState<
     { time: number; [key: string]: number }[]
   >([]);
+  const hasAlertBeenSent = useRef(false);
 
   const updateBrainData = async () => {
     try {
-     const inputData = {
+      const inputData = {
         Fp1: Math.random() * 100,
         Fp2: Math.random() * 100,
         C3: Math.random() * 100,
@@ -127,20 +129,49 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return { ...channel, history };
       });
 
-      const now = Date.now();
-      const newTimePoint = {
-        time: now,
-        ...updatedChannels.reduce(
-          (acc, channel) => ({ ...acc, [channel.name]: channel.value }),
-          {}
-        ),
-      };
+      setMentalState(mentalState);
+
+      // Check if alert condition is met and hasn't been sent yet
+      if (
+        (isMessage || dominantWave.name === "Delta" || dominantWave.name === "Theta") &&
+        !hasAlertBeenSent.current
+      ) {
+        if (isMessage || dominantWave.value > 60) {
+          try {
+            console.log("Sending Emergency Message to Parent");
+            await fetch("http://localhost:9000/api/emergency-notification", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: "Dharanish A M",
+                phone: "+918668030261",
+                location: "Coimbatore, Pollachi",
+              }),
+            });
+            console.log("🚨 Emergency alert sent to parent.");
+            hasAlertBeenSent.current = true;
+          } catch (notifyError) {
+            console.error(
+              "Failed to send emergency notification:",
+              notifyError
+            );
+          }
+        }
+      }
 
       setChannels(updatedChannels);
       setBrainwaves(brainwaves);
-      setMentalState(mentalState);
       setFocusLevel(focusLevel);
-      setTimeSeriesData((prev) => [...prev.slice(-100), newTimePoint]);
+      setTimeSeriesData((prev) => [
+        ...prev.slice(-100),
+        {
+          time: Date.now(),
+          ...updatedChannels.reduce(
+            (acc, channel) => ({ ...acc, [channel.name]: channel.value }),
+            {}
+          ),
+        },
+      ]);
     } catch (error) {
       console.error("Error updating brain data:", error);
     }

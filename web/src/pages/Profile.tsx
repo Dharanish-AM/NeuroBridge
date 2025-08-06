@@ -78,6 +78,11 @@ const Profile: React.FC = () => {
             </div>
             
             <div className="space-y-2">
+              <Label htmlFor="parentPhone">Parent Phone Number</Label>
+              <Input id="parentPhone" type="tel" defaultValue="+918668030261" placeholder="+91XXXXXXXXXX" />
+            </div>
+            
+            <div className="space-y-2">
               <Label htmlFor="education">Education Level</Label>
               <Input id="education" defaultValue="Bachelor's - Computer Science" />
             </div>
