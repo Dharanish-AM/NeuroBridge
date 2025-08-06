@@ -5,7 +5,7 @@ import joblib
 import numpy as np
 from typing import Dict
 
-# Define FastAPI app
+
 app = FastAPI()
 
 app.add_middleware(
@@ -16,14 +16,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load model and scaler
+
 model = joblib.load("brainwave_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
 brainwave_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
 
 
-# Define input schema using Pydantic
+
 class EEGInput(BaseModel):
     Fp1: float
     Fp2: float
@@ -34,12 +34,12 @@ class EEGInput(BaseModel):
 @app.post("/predict", response_model=Dict[str, float])
 async def predict_brainwaves(eeg: EEGInput):
     try:
-        # Prepare and scale input
+        
         input_array = np.array([[eeg.Fp1, eeg.Fp2, eeg.C3, eeg.C4]])
         input_scaled = scaler.transform(input_array)
         prediction = model.predict(input_scaled)[0]
 
-        # Map predictions to brainwave names
+        
         result = {name: round(val, 3) for name, val in zip(brainwave_names, prediction)}
         return result
 

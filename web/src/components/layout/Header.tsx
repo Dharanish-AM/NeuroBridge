@@ -11,9 +11,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useBrainData } from '@/context/BrainDataContext';
+import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const { focusLevel } = useBrainData();
+  const navigate = useNavigate();
 
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6">
@@ -74,8 +76,9 @@ const Header: React.FC = () => {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Analytics</DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>{
+              navigate("/profile")
+            }}>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Log out</DropdownMenuItem>

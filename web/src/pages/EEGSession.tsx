@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -15,7 +15,26 @@ const EEGSession: React.FC = () => {
   const [showFiltered, setShowFiltered] = useState<boolean>(true);
   const [selectedTab, setSelectedTab] = useState<string>("all");
 
-  // Group channels for display
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setDuration(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRecording]);
+  
+  const formatDuration = (seconds: number) => {
+    const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+  };
+
+  
   const groupedChannels = {
     all: channels,
     frontal: channels.filter(c => c.name.startsWith('F') || c.name.startsWith('Fp')),
@@ -24,12 +43,12 @@ const EEGSession: React.FC = () => {
     occipital: channels.filter(c => c.name.startsWith('O')),
   };
 
-  // Determine mental state badge color
+  
   const getMentalStateBadgeVariant = (state: string) => {
     switch (state) {
-      case 'Focused': return 'default'; // Blue in shadcn
-      case 'Relaxed': return 'secondary'; // Gray
-      case 'Drowsy': return 'destructive'; // Red
+      case 'Focused': return 'default'; 
+      case 'Relaxed': return 'secondary'; 
+      case 'Drowsy': return 'destructive'; 
       default: return 'outline';
     }
   };
@@ -136,7 +155,7 @@ const EEGSession: React.FC = () => {
           <dl className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
               <dt className="text-sm font-medium text-muted-foreground">Duration</dt>
-              <dd className="text-xl font-bold">00:15:23</dd>
+              <dd className="text-xl font-bold">{formatDuration(duration)}</dd>
             </div>
             <div className="space-y-1">
               <dt className="text-sm font-medium text-muted-foreground">Sampling Rate</dt>

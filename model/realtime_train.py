@@ -8,26 +8,26 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
-# Load dataset
+
 df = pd.read_csv('eeg_brainwave_data.csv')
 
-# Input (EEG signals) and Output (Brainwave frequencies)
+
 X = df[['Fp1', 'Fp2', 'C3', 'C4']]
 y = df[['Delta', 'Theta', 'Alpha', 'Beta', 'Gamma']]
 
-# Scale input features
+
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# Train-test split for model evaluation
+
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-# Model training
+
 base_model = RandomForestRegressor(n_estimators=100, random_state=42)
 model = MultiOutputRegressor(base_model)
 model.fit(X_train, y_train)
 
-# Evaluate model
+
 y_pred = model.predict(X_test)
 brainwave_names = ['Delta', 'Theta', 'Alpha', 'Beta', 'Gamma']
 
@@ -44,7 +44,7 @@ for i, wave in enumerate(brainwave_names):
 joblib.dump(model, 'brainwave_model.pkl')
 joblib.dump(scaler, 'scaler.pkl')
 
-# ----------- Real-time-like testing -----------
+
 
 def predict_brainwaves(raw_eeg_list):
     """Predict and plot brainwaves from new raw EEG inputs."""
@@ -56,7 +56,7 @@ def predict_brainwaves(raw_eeg_list):
         for name, val in zip(brainwave_names, prediction[i]):
             print(f"  {name}: {val:.3f} Hz")
         
-        # Plotting
+        
         plt.figure(figsize=(8, 4))
         plt.bar(brainwave_names, prediction[i], color='skyblue')
         plt.title(f"Predicted Brainwave Frequencies (Sample {i+1})")
@@ -66,12 +66,12 @@ def predict_brainwaves(raw_eeg_list):
         plt.show()
 
 
-# Example real-time test data (you can replace this with continuous input later)
+
 test_eeg_data = [
     [0.6, -0.2, 0.3, 0.1],
     [-0.1, 0.4, -0.3, 0.2],
     [0.3, 0.1, -0.2, -0.1]
 ]
 
-# Predict and display
+
 predict_brainwaves(test_eeg_data)

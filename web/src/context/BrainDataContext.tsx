@@ -42,12 +42,12 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateBrainData = async () => {
     try {
-      const inputData = {
+     const inputData = {
         Fp1: Math.random() * 100,
         Fp2: Math.random() * 100,
         C3: Math.random() * 100,
         C4: Math.random() * 100,
-      }
+      };
 
       const response = await fetch("http://localhost:8000/predict", {
         method: "POST",

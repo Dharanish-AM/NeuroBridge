@@ -13,24 +13,24 @@ import { BarChart3, BookOpen, Brain, CalendarDays, Clock, LineChart, Zap } from 
 import { Link } from 'react-router-dom';
 import BrainActivityMap from '@/components/dashboard/BrainActivityMap';
 
-// Define the time range type
+
 type TimeRangeType = 'today' | 'week' | 'month';
 
 const Dashboard: React.FC = () => {
   const { mentalState, focusLevel, brainwaves } = useBrainData();
   const [timeRange, setTimeRange] = useState<TimeRangeType>('today');
 
-  // Determine mental state badge color
+  
   const getMentalStateBadgeVariant = (state: string) => {
     switch (state) {
-      case 'Focused': return 'default'; // Blue in shadcn
-      case 'Relaxed': return 'secondary'; // Gray
-      case 'Drowsy': return 'destructive'; // Red
+      case 'Focused': return 'default'; 
+      case 'Relaxed': return 'secondary'; 
+      case 'Drowsy': return 'destructive'; 
       default: return 'outline';
     }
   };
 
-  // Calculate dominant brainwave
+  
   const getDominantBrainwave = () => {
     if (!brainwaves.length) return { name: 'None', value: 0 };
     return brainwaves.reduce((prev, current) => (current.value > prev.value) ? current : prev);
@@ -229,7 +229,7 @@ const Dashboard: React.FC = () => {
   );
 };
 
-// Helper function to get brainwave descriptions
+
 const getBrainwaveDescription = (waveName: string): string => {
   switch (waveName) {
     case 'Delta':
