@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from "react";
 
-// Define types for our brain data
 export interface ChannelData {
   name: string;
   value: number;
@@ -24,7 +23,6 @@ interface BrainDataContextType {
   updateBrainData: () => void;
 }
 
-// Create context with a default value
 const BrainDataContext = createContext<BrainDataContextType | undefined>(
   undefined
 );
@@ -131,7 +129,6 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setMentalState(mentalState);
 
-      // Check if alert condition is met and hasn't been sent yet
       if (
         (isMessage || dominantWave.name === "Delta" || dominantWave.name === "Theta") &&
         !hasAlertBeenSent.current
@@ -177,10 +174,8 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Initialize data on mount
   useEffect(() => {
     updateBrainData();
-    // Set up interval for real-time updates
     const interval = setInterval(updateBrainData, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -201,7 +196,6 @@ export const BrainDataProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// Custom hook to use the brain data context
 export const useBrainData = () => {
   const context = useContext(BrainDataContext);
   if (context === undefined) {
